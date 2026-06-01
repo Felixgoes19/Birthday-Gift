@@ -2,145 +2,301 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Für dich ❤️</title>
     <style>
-        /* Grunddesign */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #fce4ec;
-            color: #333;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: #000000;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden; display: flex; justify-content: center; align-items: center;
         }
 
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
+        #fireworksCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1; pointer-events: none;
         }
 
-        /* Styling für Formulare & Inputs */
-        input[type="text"], input[type="password"] {
-            width: 80%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 2px solid #f48fb1;
-            border-radius: 8px;
-            font-size: 16px;
-            text-align: center;
+        .wrapper {
+            position: relative; z-index: 2; width: 100%; height: 100dvh;
+            max-width: 400px; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; padding: 20px;
         }
 
-        button {
-            background-color: #f50057;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.3s;
+        #lock-screen {
+            display: flex; flex-direction: column; align-items: center;
+            width: 100%; text-align: center;
+            transition: opacity 0.5s ease, transform 0.5s ease;
         }
 
-        button:hover {
-            background-color: #c51162;
+        .lock-header { color: #ffffff; margin-bottom: 25px; }
+        .lock-header h2 { font-size: 24px; font-weight: 400; margin: 0 0 10px 0; letter-spacing: 0.5px; }
+        .lock-header p { font-size: 15px; color: rgba(255, 255, 255, 0.8); margin: 0; }
+
+        .dots-container { display: flex; gap: 22px; margin-bottom: 50px; }
+        .dot {
+            width: 14px; height: 14px; border: 1.5px solid #ffffff;
+            border-radius: 50%; transition: background-color 0.15s ease;
+        }
+        .dot.active { background-color: #ffffff; }
+
+        .keypad {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 18px 28px; justify-items: center; width: 100%; max-width: 290px;
         }
 
-        /* Bereiche verstecken */
-        .hidden {
-            display: none;
+        .key {
+            width: 78px; height: 78px; border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.15); color: #ffffff;
+            font-size: 32px; font-weight: 300; display: flex; justify-content: center;
+            align-items: center; cursor: pointer; border: none; outline: none;
+            transition: background-color 0.2s ease;
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        }
+        .key:active { background-color: rgba(255, 255, 255, 0.4); }
+        .key.action { background-color: transparent; font-size: 16px; font-weight: 400; backdrop-filter: none; -webkit-backdrop-filter: none; }
+        .key.action:active { background-color: transparent; color: rgba(255, 255, 255, 0.5); }
+
+        .error-message {
+            color: #ff3b30; font-size: 15px; margin-top: 30px;
+            min-height: 20px; opacity: 0; transition: opacity 0.3s ease;
         }
 
-        .error {
-            color: red;
-            font-size: 14px;
-            margin-top: 5px;
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
         }
-
-        /* Bilder-Styling */
-        .gallery img {
-            width: 100%;
-            max-height: 300px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin: 10px 0;
-        }
+        .shake { animation: shake 0.4s ease-in-out; }
     </style>
 </head>
 <body>
 
-<div id="lock-screen" class="container">
-    <h2>🔒 Zahlenschloss</h2>
-    <p>Gib den geheimen Code ein, um die Seite zu öffnen:</p>
-    <input type="password" id="code-input" placeholder="Zahlencode eingeben...">
-    <br>
-    <button onclick="checkCode()">Öffnen</button>
-    <p id="error-msg" class="error hidden">Falscher Code! Versuche es noch einmal. 🤔</p>
-</div>
+<canvas id="fireworksCanvas"></canvas>
 
-<div id="content-screen" class="container hidden">
-    <h1>Alles Gute zum Geburtstag! 🎉❤️</h1>
-    <p>Schön, dass du es geschafft hast. Hier ist deine Überraschung...</p>
+<div class="wrapper">
+    <div id="lock-screen">
+        <div class="lock-header">
+            <h2>Code eingeben</h2>
+            <p>Uhrzeit eures Jahrestags?</p>
+        </div>
 
-    <hr>
+        <div class="dots-container">
+            <div class="dot" id="dot-1"></div>
+            <div class="dot" id="dot-2"></div>
+            <div class="dot" id="dot-3"></div>
+            <div class="dot" id="dot-4"></div>
+        </div>
 
-    <h3>Unsere Momente 📸</h3>
-    <div class="gallery">
-        <img src="bild1.jpg" alt="Unser schönstes Foto">
-        <p><i>Erinnerung an einen ganz besonderen Tag...</i></p>
-    </div>
+        <div class="keypad">
+            <button class="key" onclick="pressKey('1')">1</button>
+            <button class="key" onclick="pressKey('2')">2</button>
+            <button class="key" onclick="pressKey('3')">3</button>
 
-    <hr>
+            <button class="key" onclick="pressKey('4')">4</button>
+            <button class="key" onclick="pressKey('5')">5</button>
+            <button class="key" onclick="pressKey('6')">6</button>
 
-    <h3>Ein kleines Quiz für dich 🤔</h3>
-    <div id="quiz-zone">
-        <p><b>Frage 1: Wo hatten wir unser erstes Date?</b></p>
-        <input type="text" id="quiz-answer" placeholder="Deine Antwort...">
-        <br>
-        <button onclick="checkQuiz()">Antwort prüfen</button>
-        <p id="quiz-success" class="hidden" style="color: green; font-weight: bold; margin-top: 10px;">Richtig! Extrapunkt für dich! 🌟</p>
+            <button class="key" onclick="pressKey('7')">7</button>
+            <button class="key" onclick="pressKey('8')">8</button>
+            <button class="key" onclick="pressKey('9')">9</button>
+
+            <div class="key action"></div>
+            <button class="key" onclick="pressKey('0')">0</button>
+            <button class="key action" onclick="deleteKey()">Löschen</button>
+        </div>
+
+        <div id="error-msg" class="error-message">Falscher Code! Versuchs noch mal. ❤️</div>
     </div>
 </div>
 
 <script>
-    // Hier legst du fest, wie das Passwort lauten soll
     const GEHEIMER_CODE = "1234";
+    let currentInput = "";
+
+    function pressKey(num) {
+        if (currentInput.length >= 4) return;
+        currentInput += num;
+        updateDots();
+        hideError();
+        if (currentInput.length === 4) {
+            setTimeout(checkCode, 200);
+        }
+    }
+
+    function deleteKey() {
+        if (currentInput.length > 0) {
+            currentInput = currentInput.slice(0, -1);
+            updateDots();
+            hideError();
+        }
+    }
+
+    function updateDots() {
+        for (let i = 1; i <= 4; i++) {
+            const dot = document.getElementById(`dot-${i}`);
+            if (i <= currentInput.length) {
+                dot.classList.add("active");
+            } else {
+                dot.classList.remove("active");
+            }
+        }
+    }
+
+    function showError() {
+        const errorMsg = document.getElementById("error-msg");
+        const lockScreen = document.getElementById("lock-screen");
+        errorMsg.style.opacity = "1";
+        lockScreen.classList.add("shake");
+        setTimeout(() => { lockScreen.classList.remove("shake"); }, 400);
+        currentInput = "";
+        updateDots();
+    }
+
+    function hideError() { document.getElementById("error-msg").style.opacity = "0"; }
 
     function checkCode() {
-        const input = document.getElementById("code-input").value;
+        if (currentInput === GEHEIMER_CODE) {
+            unlock();
+        } else {
+            showError();
+        }
+    }
+
+    function unlock() {
         const lockScreen = document.getElementById("lock-screen");
-        const contentScreen = document.getElementById("content-screen");
-        const errorMsg = document.getElementById("error-msg");
+        lockScreen.style.opacity = "0";
+        lockScreen.style.transform = "scale(0.9)";
 
-        if (input === GEHEIMER_CODE) {
-            // Schloss verstecken, Inhalt anzeigen
-            lockScreen.classList.add("hidden");
-            contentScreen.classList.remove("hidden");
-        } else {
-            // Fehlermeldung anzeigen
-            errorMsg.classList.remove("hidden");
+        // NACH DEM AUSBLENDEN WIRD AUF DIE NEUE SEITE WEITERGELEITET
+        setTimeout(() => {
+            window.location.href = "geschenk.html";
+        }, 500);
+    }
+
+    // --- HERZ-FEUERWERK (ALS GROSSES HERZ) ---
+    const canvas = document.getElementById('fireworksCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let rockets = [];
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function drawHeart(c, x, y, size, color, alpha) {
+        c.save();
+        c.globalAlpha = alpha;
+        c.beginPath();
+        c.translate(x, y);
+        c.moveTo(0, -size / 4);
+        c.bezierCurveTo(size / 2, -size / 2, size, 0, 0, size);
+        c.bezierCurveTo(-size, 0, -size / 2, -size / 2, 0, -size / 4);
+        c.fillStyle = color;
+        c.fill();
+        c.restore();
+    }
+
+    class Rocket {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = canvas.height;
+            this.tx = Math.random() * canvas.width;
+            this.ty = Math.random() * (canvas.height * 0.5) + 50;
+            this.vx = (this.tx - this.x) / 80;
+            this.vy = (this.ty - this.y) / 80;
+            this.color = `hsl(${Math.random() * 20 + 340}, 100%, 60%)`;
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            if (this.vy >= 0 || this.y <= this.ty) {
+                explode(this.x, this.y, this.color);
+                return false;
+            }
+            return true;
+        }
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.fill();
         }
     }
 
-    function checkQuiz() {
-        const antwort = document.getElementById("quiz-answer").value.toLowerCase().trim();
-        const erfolgsMsg = document.getElementById("quiz-success");
-
-        // Hier die richtige Antwort eintragen (wird durch .toLowerCase() kleingeschrieben abgeglichen)
-        if (antwort === "im kino" || antwort === "kino") {
-            erfolgsMsg.classList.remove("hidden");
-        } else {
-            alert("Knapp daneben! Versuch es noch mal. 😉");
+    class Particle {
+        constructor(x, y, vx, vy, color) {
+            this.x = x;
+            this.y = y;
+            // Kleine Zufallsabweichung für einen natürlichen Explosionseffekt
+            const jitter = 1 + (Math.random() * 0.2 - 0.1);
+            this.vx = vx * jitter;
+            this.vy = vy * jitter;
+            this.friction = 0.93;
+            this.gravity = 0.03; // Sanftes Absinken
+            this.alpha = 1;
+            this.decay = Math.random() * 0.01 + 0.008;
+            this.color = color;
+            this.size = Math.random() * 4 + 3; // Kleinere Partikel bilden schönere Formen
+        }
+        update() {
+            this.vx *= this.friction;
+            this.vy *= this.friction;
+            this.x += this.vx;
+            this.y += this.vy + this.gravity;
+            this.alpha -= this.decay;
+            return this.alpha > 0;
+        }
+        draw() {
+            drawHeart(ctx, this.x, this.y, this.size, this.color, this.alpha);
         }
     }
+
+    function explode(x, y, color) {
+        const count = 400; // Anzahl der Partikel pro Explosion
+        for (let i = 0; i < count; i++) {
+            // Parameter-Kurve für ein Herz
+            const t = (Math.PI * 2 * i) / count;
+            const hx = 16 * Math.pow(Math.sin(t), 3);
+            // Die Y-Achse auf dem Canvas ist umgedreht, daher das Minus
+            const hy = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+
+            // Skalierung: Wie groß wird das Herz?
+            const scale = 0.8;
+            const vx = hx * scale;
+            const vy = hy * scale;
+
+            particles.push(new Particle(x, y, vx, vy, color));
+        }
+    }
+
+    function loop() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        if (Math.random() < 0.018) {
+            rockets.push(new Rocket());
+        }
+
+        rockets = rockets.filter(r => {
+            if (r.update()) { r.draw(); return true; }
+            return false;
+        });
+
+        particles = particles.filter(p => {
+            if (p.update()) { p.draw(); return true; }
+            return false;
+        });
+
+        requestAnimationFrame(loop);
+    }
+
+    loop();
 </script>
 </body>
 </html>

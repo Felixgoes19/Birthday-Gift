@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Überraschung! 🎉</title>
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 100%; min-height: 100vh;
+            background-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        #roseCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1; pointer-events: none;
+        }
+
+        .content-wrapper {
+            position: relative; z-index: 2; width: 100%; min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: 20px; box-sizing: border-box;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.92); padding: 30px;
+            border-radius: 20px; box-shadow: 0 10px 40px rgba(255, 105, 180,0.8);
+            max-width: 500px; width: 100%; text-align: center;
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            animation: fadeIn 1.2s ease-in-out;
+            min-height: 350px; /* Hält die Box auf einer konstanten Höhe, damit sie beim Fragenwechsel nicht springt */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        hr { border: 0; height: 1px; background: rgba(0, 0, 0, 0.1); margin: 25px 0; }
+
+        input[type="text"] {
+            width: 80%; padding: 12px; margin: 15px 0;
+            border: 2px solid #ff2d55; border-radius: 8px; font-size: 16px;
+            text-align: center; outline: none; transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #d81b60;
+        }
+
+        button {
+            background-color: #ff2d55; color: white; border: none;
+            padding: 12px 24px; font-size: 16px; border-radius: 8px;
+            cursor: pointer; transition: background 0.3s; width: 80%; max-width: 200px;
+        }
+
+        button:hover { background-color: #d81b60; }
+
+        /* Klassen für den weichen Übergang der Fragen */
+        .question-block {
+            opacity: 1;
+            transition: opacity 0.4s ease-in-out;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Feinschliff für Texte */
+        .quiz-intro { font-size: 15px; color: #555; margin-bottom: 20px; }
+        .question-number { font-size: 13px; color: #ff2d55; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .final-msg { color: #34c759; font-weight: bold; font-size: 20px; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+<canvas id="roseCanvas"></canvas>
+
+<div class="content-wrapper">
+    <div class="container">
+
+        <h1>Alles Gute zum Geburtstag! 🎉❤️</h1>
+        <p>Du hast das Schloss geknackt. Hier ist deine Überraschung...</p>
+        <hr>
+
+        <div id="q1" class="question-block">
+            <p class="quiz-intro">Bevor du dein Geschenk bekommst, musst du noch eine letzte kleine Prüfung bestehen. 😉</p>
+            <div class="question-number">Frage 1 von 3</div>
+            <p><b>Wo hatten wir unser erstes Date?</b></p>
+            <input type="text" id="a1" placeholder="Deine Antwort...">
+            <br>
+            <button onclick="checkAnswer(1)">Antwort prüfen</button>
+        </div>
+
+        <div id="q2" class="question-block hidden" style="opacity: 0;">
+            <div class="question-number">Frage 2 von 3</div>
+            <p><b>In welcher niederländischen Stadt waren wir im Mai unterwegs?</b></p>
+            <input type="text" id="a2" placeholder="Deine Antwort...">
+            <br>
+            <button onclick="checkAnswer(2)">Antwort prüfen</button>
+        </div>
+
+        <div id="q3" class="question-block hidden" style="opacity: 0;">
+            <div class="question-number">Frage 3 von 3</div>
+            <p><b>Welcher Tag ist unser Jahrestag? (Format: TT.MM.)</b></p>
+            <input type="text" id="a3" placeholder="Deine Antwort...">
+            <br>
+            <button onclick="checkAnswer(3)">Antwort prüfen</button>
+        </div>
+
+        <div id="q4" class="question-block hidden" style="opacity: 0;">
+            <h2 class="final-msg">Geschafft! 🌟</h2>
+            <p>Du hast alle Rätsel gelöst. Ich liebe dich!</p>
+            <p style="margin-top: 20px; font-size: 14px; color: #666;"><i>Hier könntest du jetzt z.B. einen Gutschein-Code, ein finaleres Bild oder den Ort des echten Geschenks einblenden.</i></p>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // --- QUIZ LOGIK ---
+
+    // Hier legst du alle richtigen Antworten für die Fragen fest.
+    // Schreibe sie komplett klein. Du kannst pro Frage auch mehrere gültige Antworten angeben.
+    const quizAnswers = {
+        1: ["kino", "im kino"],
+        2: ["rotterdam", "den haag"],
+        3: ["12.05.", "12.05", "12. mai"] // Tausche das gegen echten Jahrestag aus
+    };
+
+    function checkAnswer(currentId) {
+        // Liest das Eingabefeld aus, macht es klein und entfernt Leerzeichen am Rand
+        const input = document.getElementById('a' + currentId).value.toLowerCase().trim();
+        const correctAnswers = quizAnswers[currentId];
+
+        if (correctAnswers.includes(input)) {
+            // Wenn richtig: Blöcke faden
+            const currentBlock = document.getElementById('q' + currentId);
+            const nextBlock = document.getElementById('q' + (currentId + 1));
+
+            // 1. Aktuellen Block ausblenden (Opacity auf 0)
+            currentBlock.style.opacity = '0';
+
+            // 2. Kurz warten (400ms = Dauer der CSS Transition)
+            setTimeout(() => {
+                // Aktuellen Block komplett wegnehmen
+                currentBlock.classList.add('hidden');
+
+                if (nextBlock) {
+                    // Nächsten Block ins Layout holen (ist aber noch unsichtbar durch Opacity 0)
+                    nextBlock.classList.remove('hidden');
+
+                    // Kleiner Trick: Erzwingt ein Neu-Rendern, damit die Transition flüssig läuft
+                    void nextBlock.offsetWidth;
+
+                    // Nächsten Block einblenden
+                    nextBlock.style.opacity = '1';
+                }
+            }, 400);
+
+        } else {
+            alert("Knapp daneben! Versuch es noch mal. 😉");
+        }
+    }
+
+    // --- PARTIKEL-LINE-ART-ROSEN ENGINE (Bleibt identisch) ---
+    const canvas = document.getElementById('roseCanvas');
+    const ctx = canvas.getContext('2d');
+    let roses = [];
+    let stencilPoints = [];
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function createRoseStencil() {
+        const tempCanvas = document.createElement('canvas');
+        const tCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
+        tempCanvas.width = 100;
+        tempCanvas.height = 150;
+
+        tCtx.strokeStyle = "white";
+        tCtx.lineWidth = 1.2;
+        tCtx.lineCap = "round";
+        tCtx.lineJoin = "round";
+        tCtx.beginPath();
+
+        // Blüte
+        tCtx.moveTo(50, 35); tCtx.bezierCurveTo(45, 25, 60, 25, 55, 38); tCtx.bezierCurveTo(50, 45, 40, 40, 42, 32); tCtx.bezierCurveTo(45, 20, 65, 20, 68, 35);
+        tCtx.moveTo(42, 32); tCtx.bezierCurveTo(25, 35, 30, 55, 50, 60); tCtx.moveTo(68, 35); tCtx.bezierCurveTo(80, 35, 80, 55, 50, 60);
+        tCtx.moveTo(30, 55); tCtx.bezierCurveTo(30, 75, 70, 75, 80, 55);
+        tCtx.moveTo(50, 60); tCtx.bezierCurveTo(20, 65, 10, 80, 45, 85); tCtx.moveTo(50, 60); tCtx.bezierCurveTo(80, 65, 90, 80, 55, 85);
+        tCtx.moveTo(45, 85); tCtx.quadraticCurveTo(50, 92, 55, 85);
+        tCtx.moveTo(45, 85); tCtx.lineTo(32, 98); tCtx.lineTo(48, 88); tCtx.moveTo(55, 85); tCtx.lineTo(68, 98); tCtx.lineTo(52, 88);
+
+        // Stängel & Blätter
+        tCtx.moveTo(50, 88); tCtx.quadraticCurveTo(45, 120, 55, 150);
+        tCtx.moveTo(48, 105); tCtx.lineTo(40, 105); tCtx.lineTo(47, 110); tCtx.moveTo(52, 130); tCtx.lineTo(60, 125); tCtx.lineTo(54, 135);
+        tCtx.moveTo(47, 118); tCtx.quadraticCurveTo(20, 108, 12, 125); tCtx.quadraticCurveTo(25, 138, 49, 125); tCtx.moveTo(47, 118); tCtx.quadraticCurveTo(30, 122, 18, 125);
+        tCtx.moveTo(51, 135); tCtx.quadraticCurveTo(80, 125, 88, 110); tCtx.quadraticCurveTo(75, 95, 49, 123); tCtx.moveTo(51, 135); tCtx.quadraticCurveTo(65, 123, 80, 110);
+
+        tCtx.stroke();
+
+        const imgData = tCtx.getImageData(0, 0, 100, 150).data;
+        for (let y = 0; y < 150; y += 2) {
+            for (let x = 0; x < 100; x += 2) {
+                const alpha = imgData[(y * 100 + x) * 4 + 3];
+                if (alpha > 50) {
+                    stencilPoints.push({ dx: x - 50, dy: y - 75, isFlower: y < 88 });
+                }
+            }
+        }
+    }
+    createRoseStencil();
+
+    class ParticleRose {
+        constructor() {
+            this.x = Math.random() * (canvas.width * 0.7) + canvas.width * 0.15;
+            this.y = Math.random() * (canvas.height * 0.7) + canvas.height * 0.15;
+            this.baseScale = Math.random() * 2.5 + 3.0;
+            this.isPink = Math.random() > 0.5;
+            this.birth = Date.now();
+            this.lifeTime = 6000;
+
+            this.particles = stencilPoints.map(pt => {
+                let hue, saturation, lightness;
+                if (pt.isFlower) {
+                    hue = this.isPink ? (330 + Math.random() * 20) : (350 + Math.random() * 15);
+                    saturation = '100%'; lightness = '70%';
+                } else {
+                    hue = 110 + Math.random() * 30;
+                    saturation = '75%'; lightness = '50%';
+                }
+                return {
+                    dx: pt.dx, dy: pt.dy,
+                    jitterX: (Math.random() - 0.5) * 1.2, jitterY: (Math.random() - 0.5) * 1.2,
+                    size: Math.random() * 1.5 + 1.0,
+                    color: `hsl(${hue}, ${saturation}, ${lightness})`
+                };
+            });
+        }
+
+        draw() {
+            const age = Date.now() - this.birth;
+            if (age > this.lifeTime) return false;
+            const progress = age / this.lifeTime;
+            let currentScale = this.baseScale;
+            let alpha = 1;
+
+            if (progress < 0.15) {
+                const p = progress / 0.15;
+                currentScale = this.baseScale * (0.85 + p * 0.15);
+                alpha = p;
+            } else if (progress > 0.8) {
+                const p = (progress - 0.8) / 0.2;
+                alpha = 1 - p;
+                currentScale = this.baseScale + (p * 0.15);
+            }
+
+            this.y -= 0.08;
+
+            ctx.save();
+            ctx.globalAlpha = alpha;
+
+            this.particles.forEach(pt => {
+                const px = this.x + (pt.dx + pt.jitterX) * currentScale;
+                const py = this.y + (pt.dy + pt.jitterY) * currentScale;
+                ctx.beginPath();
+                ctx.arc(px, py, pt.size * (currentScale / this.baseScale), 0, Math.PI * 2);
+                ctx.fillStyle = pt.color;
+                ctx.shadowBlur = 5;
+                ctx.shadowColor = pt.color;
+                ctx.fill();
+            });
+
+            ctx.restore();
+            return true;
+        }
+    }
+
+    function loop() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        roses = roses.filter(rose => rose.draw());
+        requestAnimationFrame(loop);
+    }
+
+    loop();
+
+    // Alle 2,2 Sekunden eine neue Rose generieren
+    setInterval(() => {
+        roses.push(new ParticleRose());
+    }, 1500);
+
+    roses.push(new ParticleRose());
+</script>
+</body>
+</html>
