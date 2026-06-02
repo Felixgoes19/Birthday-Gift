@@ -82,13 +82,13 @@
     <div class="container">
 
         <h1>Alles Gute zum Geburtstag! 🎉❤️</h1>
-        <p>Du hast das Schloss geknackt. Hier ist deine Überraschung...</p>
+        <p>Hier steht test</p>
         <hr>
 
         <div id="q1" class="question-block">
-            <p class="quiz-intro">Bevor du dein Geschenk bekommst, musst du noch eine letzte kleine Prüfung bestehen. 😉</p>
+            <p class="quiz-intro">Fragerunde</p>
             <div class="question-number">Frage 1 von 3</div>
-            <p><b>Wo hatten wir unser erstes Date?</b></p>
+            <p><b>Frage 1</b></p>
             <input type="text" id="a1" placeholder="Deine Antwort...">
             <br>
             <button onclick="checkAnswer(1)">Antwort prüfen</button>
@@ -96,7 +96,7 @@
 
         <div id="q2" class="question-block hidden" style="opacity: 0;">
             <div class="question-number">Frage 2 von 3</div>
-            <p><b>In welcher niederländischen Stadt waren wir im Mai unterwegs?</b></p>
+            <p><b>Frage 2</b></p>
             <input type="text" id="a2" placeholder="Deine Antwort...">
             <br>
             <button onclick="checkAnswer(2)">Antwort prüfen</button>
@@ -104,7 +104,7 @@
 
         <div id="q3" class="question-block hidden" style="opacity: 0;">
             <div class="question-number">Frage 3 von 3</div>
-            <p><b>Welcher Tag ist unser Jahrestag? (Format: TT.MM.)</b></p>
+            <p><b>Frage 3</b></p>
             <input type="text" id="a3" placeholder="Deine Antwort...">
             <br>
             <button onclick="checkAnswer(3)">Antwort prüfen</button>
@@ -112,7 +112,7 @@
 
         <div id="q4" class="question-block hidden" style="opacity: 0;">
             <h2 class="final-msg">Geschafft! 🌟</h2>
-            <p>Du hast alle Rätsel gelöst. Ich liebe dich!</p>
+            <p>alles richtig</p>
             <p style="margin-top: 20px; font-size: 14px; color: #666;"><i>Hier könntest du jetzt z.B. einen Gutschein-Code, ein finaleres Bild oder den Ort des echten Geschenks einblenden.</i></p>
         </div>
 
@@ -125,9 +125,9 @@
     // Hier legst du alle richtigen Antworten für die Fragen fest.
     // Schreibe sie komplett klein. Du kannst pro Frage auch mehrere gültige Antworten angeben.
     const quizAnswers = {
-        1: ["kino", "im kino"],
-        2: ["rotterdam", "den haag"],
-        3: ["12.05.", "12.05", "12. mai"] // Tausche das gegen echten Jahrestag aus
+        1: ["1", "1"],
+        2: ["2", "2"],
+        3: ["3", "3", "3"] // Tausche das gegen echten Jahrestag aus
     };
 
     function checkAnswer(currentId) {
