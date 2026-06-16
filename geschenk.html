@@ -72,6 +72,32 @@
         .quiz-intro { font-size: 15px; color: #555; margin-bottom: 20px; }
         .question-number { font-size: 13px; color: #ff2d55; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
         .final-msg { color: #34c759; font-weight: bold; font-size: 20px; margin-top: 15px; }
+
+        /* Button für Lösungen */
+        .solution-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #ff2d55;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            font-family: sans-serif;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(255, 45, 85, 0.5);
+            z-index: 9999;
+            transition: transform 0.3s, background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .solution-btn:hover {
+            background-color: #d81b60;
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
@@ -79,38 +105,89 @@
 <canvas id="roseCanvas"></canvas>
 
 <div class="content-wrapper">
-    <div class="container">
+    <div class="container" >
 
-        <h1>Alles Gute zum Geburtstag! 🎉❤️</h1>
-        <p>Du hast das Schloss geknackt. Hier ist deine Überraschung...</p>
+        <h1>Alles Gute zum Geburtstag mein Herz! 🎉❤️</h1>
         <hr>
 
-        <div id="q1" class="question-block">
-            <p class="quiz-intro">Bevor du dein Geschenk bekommst, musst du noch eine letzte kleine Prüfung bestehen. 😉</p>
-            <div class="question-number">Frage 1 von 3</div>
-            <p><b>Wo hatten wir unser erstes Date?</b></p>
-            <input type="text" id="a1" placeholder="Deine Antwort...">
+        <div id="q1" class="question-block" >    
+            <p class="quiz-intro">Um an dein Geschenk zu kommen muss ich dich ein eine kleine Stunde des Deutschunterrichts entführen. Verfollständige einfach die Reime :)</p>
+            <div class="question-number">Teil 1</div>
+            
+            <p style="font-family:  Lucida Handwriting, cursive"><b>So Groß und weit ist die Welt,<br>
+                8,3 Milliarden unter einem großen Himmelszelt.<br>
+            Der Hase namens Felix reist herum, wie es ihm gefällt.<br>
+            Sein Ziel hat er jetzt gefunden, in einem Menschen... <br> sein bedeutsamster, <br>
+            dieser Mensch hatte am Anfang Ähnlichkeiten mit einem ...</b></p>
+            <input type="text" id="a1" placeholder="Deine Antwort..." style="font-family:  Lucida Handwriting, cursive">
             <br>
             <button onclick="checkAnswer(1)">Antwort prüfen</button>
         </div>
 
         <div id="q2" class="question-block hidden" style="opacity: 0;">
-            <div class="question-number">Frage 2 von 3</div>
-            <p><b>In welcher niederländischen Stadt waren wir im Mai unterwegs?</b></p>
-            <input type="text" id="a2" placeholder="Deine Antwort...">
+            <div class="question-number">Teil 2</div>
+            <p style="font-family:  Lucida Handwriting, cursive"><b>Das Duo Hamster und Hase setzte die Reise nun zu zweit fort <br>
+            Ticket gebucht...<br> zum ersten Stopp sollten sie loszieh´n:<br> Der Tag des Valentin <br>
+            Aus dem Reisebus ausgestiegen ging es zum Blumenverleih <br>
+            Es wurde gefragt: "Erst eins oder zwei?"<br>
+                Wie sah sie aus, die Prognose?<br>
+                Hinter der Blume Nummer 2 versteckte sich eine pinke...
+                
+            </b>
+            </p>
+            <input type="text" id="a2" placeholder="Deine Antwort..." style="font-family:  Lucida Handwriting, cursive">
             <br>
             <button onclick="checkAnswer(2)">Antwort prüfen</button>
         </div>
 
         <div id="q3" class="question-block hidden" style="opacity: 0;">
-            <div class="question-number">Frage 3 von 3</div>
-            <p><b>Welcher Tag ist unser Jahrestag? (Format: TT.MM.)</b></p>
-            <input type="text" id="a3" placeholder="Deine Antwort...">
+            <div class="question-number">Teil 3</div>
+            <p style="font-family:  Lucida Handwriting, cursive"><b>
+                Die erste Hürde geschafft, der nächste Schritt steht bevor,<br>
+                Angst vor nichts... höchstens Styropor. <br>
+                Das Styropor sollte den Hasen nicht aufhalten, <br>
+                Er brachte schon so weit, sich beim familiären Abendessen dazuzuschalten <br>
+                Nicht digital übers Internet, <br> sondern, zu einer schönen Runde.... <br>
+                
+                
+            </b></p>
+            <input type="text" id="a3" placeholder="Deine Antwort..." style="font-family:  Lucida Handwriting, cursive">
             <br>
             <button onclick="checkAnswer(3)">Antwort prüfen</button>
         </div>
 
         <div id="q4" class="question-block hidden" style="opacity: 0;">
+            <div class="question-number">Teil 4</div>
+            <p style="font-family:  Lucida Handwriting, cursive"><b>
+                So zogen die Tage dahin, <br>
+                in Begleitung von vielen Geschichten, Snaps und Tea, ohne Furcht und Frust im Sinn <br>
+                die Abende wurden länger und länger, <br>
+                Am Fernseher, ein treuer Anhänger...
+
+            </b></p>
+            <input type="text" id="a4" placeholder="Deine Antwort..." style="font-family:  Lucida Handwriting, cursive">
+            <br>
+            <button onclick="checkAnswer(4)">Antwort prüfen</button>
+        </div>
+
+
+        <div id="q5" class="question-block hidden" style="opacity: 0;">
+            <div class="question-number">Frage 3</div>
+            <p style="font-family:  Lucida Handwriting, cursive"><b>
+
+
+            </b></p>
+            <input type="text" id="a5" placeholder="Deine Antwort..." style="font-family:  Lucida Handwriting, cursive">
+            <br>
+            <button onclick="checkAnswer(5)">Antwort prüfen</button>
+        </div>
+        
+        
+        
+        
+        
+
+        <div id="q8" class="question-block hidden" style="opacity: 0;">
             <h2 class="final-msg">Geschafft! 🌟</h2>
             <p>Du hast alle Rätsel gelöst. Ich liebe dich!</p>
             <p style="margin-top: 20px; font-size: 14px; color: #666;"><i>Hier könntest du jetzt z.B. einen Gutschein-Code, ein finaleres Bild oder den Ort des echten Geschenks einblenden.</i></p>
@@ -119,15 +196,19 @@
     </div>
 </div>
 
+<!-- Button zum Herz -->
+<a href="herz.html" class="solution-btn">Zurück zum Herz</a>
+
 <script>
     // --- QUIZ LOGIK ---
 
     // Hier legst du alle richtigen Antworten für die Fragen fest.
     // Schreibe sie komplett klein. Du kannst pro Frage auch mehrere gültige Antworten angeben.
     const quizAnswers = {
-        1: ["kino", "im kino"],
-        2: ["rotterdam", "den haag"],
-        3: ["12.05.", "12.05", "12. mai"] // Tausche das gegen echten Jahrestag aus
+        1: ["Hamster", "hamster"],
+        2: ["Rose", "rose"],
+        3: ["Raclette", "Raclett", "raclette", "raclett", "Raclet", "raclet"],
+        4: ["türkisch für anfänger"]
     };
 
     function checkAnswer(currentId) {
