@@ -69,24 +69,41 @@ scene.add(particleSystem);
 
 // --- 5. ECHTES 3D-OBJEKT FÜR DIE BOX ---
 
+// --- 5. ECHTES 3D-OBJEKT FÜR DIE BOX ---
+
 const frageDiv = document.createElement('div');
 frageDiv.className = 'frage-box';
-// Verhindert, dass das Ziehen AN der Box die Kamera dreht (Klicks auf Knöpfe gehen aber!)
+// Verhindert, dass das Ziehen AN der Box die Kamera dreht
 frageDiv.style.pointerEvents = 'auto';
 frageDiv.addEventListener('pointerdown', (e) => e.stopPropagation());
 
+// 1. Nur das reine HTML einfügen (ohne <script> Tag!)
 frageDiv.innerHTML = `
-    <h3>Willst du meine Valentinin sein?</h3>
+    <h3>Alles gute zum Geburtstag!</h3>
     <div class="button-container">
-        <button class="antwort-btn" onclick="alert('❤️ Juhu! ❤️')">Ja</button>
-        <button class="antwort-btn" onclick="alert('Och schade... 💔')">Nein</button>
+        <audio id="meinSound1" src="Geschenk.mp3"></audio>
+        
+        <button id="audioKnopf" class="antwort-btn">Ton ab</button>
     </div>
 `;
 
-// WICHTIG: CSS3DObject statt CSS3DSprite! 
-// Dadurch wird die HTML-Box zu einer festen, flachen "Platte" im 3D-Raum.
-const frageObjekt = new THREE.CSS3DObject(frageDiv);
+// 2. Jetzt greifen wir uns den Button und das Audio-Element AUS diesem frageDiv
+const audioBtn = frageDiv.querySelector('#audioKnopf');
+const audioEl = frageDiv.querySelector('#meinSound1');
 
+// 3. Wir fügen die Klick-Logik direkt per EventListener hinzu
+audioBtn.addEventListener('click', () => {
+    if (audioEl.paused) {
+        audioEl.play();
+        audioBtn.innerText = "Ton ab";
+    } else {
+        audioEl.pause();
+        audioBtn.innerText = "Ton ab";
+    }
+});
+
+// WICHTIG: CSS3DObject statt CSS3DSprite! 
+const frageObjekt = new THREE.CSS3DObject(frageDiv);
 frageObjekt.scale.set(0.06, 0.06, 0.06);
 frageObjekt.position.set(0, 2, 0);
 
